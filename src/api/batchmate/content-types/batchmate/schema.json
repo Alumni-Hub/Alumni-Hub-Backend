@@ -1,0 +1,78 @@
+{
+  "kind": "collectionType",
+  "collectionName": "batchmates",
+  "info": {
+    "singularName": "batchmate",
+    "pluralName": "batchmates",
+    "displayName": "Batchmate",
+    "description": "Alumni batchmate records"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "callingName": {
+      "type": "string",
+      "required": true
+    },
+    "fullName": {
+      "type": "string",
+      "required": true
+    },
+    "nickName": {
+      "type": "string"
+    },
+    "field": {
+      "type": "enumeration",
+      "enum": [
+        "Computer Engineering",
+        "Electrical Engineering",
+        "Mechanical Engineering",
+        "Civil Engineering",
+        "Chemical Engineering",
+        "Biomedical Engineering",
+        "Industrial Engineering",
+        "Environmental Engineering",
+        "Aerospace Engineering",
+        "Software Engineering",
+        "Data Science",
+        "Artificial Intelligence"
+      ],
+      "required": true
+    },
+    "email": {
+      "type": "email",
+      "required": true,
+      "unique": true
+    },
+    "whatsappMobile": {
+      "type": "string",
+      "required": true
+    },
+    "mobile": {
+      "type": "string"
+    },
+    "address": {
+      "type": "text"
+    },
+    "country": {
+      "type": "string"
+    },
+    "workingPlace": {
+      "type": "string"
+    },
+    "universityPhoto": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "currentPhoto": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}
