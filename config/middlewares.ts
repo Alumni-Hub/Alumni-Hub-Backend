@@ -34,6 +34,7 @@ export default [
       origin: [
         'https://alumni-hub-frontend-njuj.vercel.app',
         'http://localhost:3000',
+        'http://localhost:3001',
       ],
       credentials: true,
     },
