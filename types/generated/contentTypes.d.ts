@@ -480,22 +480,24 @@ export interface ApiBatchmateBatchmate extends Struct.CollectionTypeSchema {
   };
   attributes: {
     address: Schema.Attribute.Text;
-    callingName: Schema.Attribute.String & Schema.Attribute.Required;
+    callingName: Schema.Attribute.String;
     country: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     currentPhoto: Schema.Attribute.Media<'images'>;
-    email: Schema.Attribute.Email &
-      Schema.Attribute.Required &
-      Schema.Attribute.Unique;
+    email: Schema.Attribute.Email;
     field: Schema.Attribute.Enumeration<
       [
         'Computer Engineering',
         'Electrical Engineering',
+        'Electronics Engineering',
         'Mechanical Engineering',
         'Civil Engineering',
         'Chemical Engineering',
+        'Material Engineering',
+        'Mining Engineering',
+        'Textile Engineering',
         'Biomedical Engineering',
         'Industrial Engineering',
         'Environmental Engineering',
@@ -520,7 +522,7 @@ export interface ApiBatchmateBatchmate extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    whatsappMobile: Schema.Attribute.String & Schema.Attribute.Required;
+    whatsappMobile: Schema.Attribute.String;
     workingPlace: Schema.Attribute.String;
   };
 }

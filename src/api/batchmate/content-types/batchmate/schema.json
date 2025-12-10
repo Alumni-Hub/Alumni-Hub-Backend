@@ -14,7 +14,7 @@
   "attributes": {
     "callingName": {
       "type": "string",
-      "required": true
+      "required": false
     },
     "fullName": {
       "type": "string",
@@ -28,9 +28,13 @@
       "enum": [
         "Computer Engineering",
         "Electrical Engineering",
+        "Electronics Engineering",
         "Mechanical Engineering",
         "Civil Engineering",
         "Chemical Engineering",
+        "Material Engineering",
+        "Mining Engineering",
+        "Textile Engineering",
         "Biomedical Engineering",
         "Industrial Engineering",
         "Environmental Engineering",
@@ -43,12 +47,12 @@
     },
     "email": {
       "type": "email",
-      "required": true,
-      "unique": true
+      "required": false,
+      "unique": false
     },
     "whatsappMobile": {
       "type": "string",
-      "required": true
+      "required": false
     },
     "mobile": {
       "type": "string"
