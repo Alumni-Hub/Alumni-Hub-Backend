@@ -77,6 +77,20 @@
       "multiple": false,
       "required": false,
       "allowedTypes": ["images"]
+    },
+    "phoneConfirmation": {
+      "type": "enumeration",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "attendance": {
+      "type": "enumeration",
+      "enum": [
+        "Present",
+        "Absent"
+      ]
     }
   }
 }
