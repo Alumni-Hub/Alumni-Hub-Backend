@@ -481,6 +481,7 @@ export interface ApiBatchmateBatchmate extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     mobile: Schema.Attribute.String;
     nickName: Schema.Attribute.String;
+    phoneConfirmation: Schema.Attribute.Enumeration<['Yes', 'No']>;
     publishedAt: Schema.Attribute.DateTime;
     universityPhoto: Schema.Attribute.Media<'images'>;
     updatedAt: Schema.Attribute.DateTime;
