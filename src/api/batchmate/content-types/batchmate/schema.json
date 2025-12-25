@@ -77,6 +77,13 @@
       "multiple": false,
       "required": false,
       "allowedTypes": ["images"]
+    },
+    "attendance": {
+      "type": "enumeration",
+      "enum": [
+        "Present",
+        "Absent"
+      ]
     }
   }
 }
