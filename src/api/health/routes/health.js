@@ -10,7 +10,7 @@ module.exports = {
     {
       method: 'GET',
       path: '/health',
-      handler: 'health.check',
+      handler: 'api::health.health.check',
       config: {
         auth: false, // No authentication required for health checks
         policies: [],
