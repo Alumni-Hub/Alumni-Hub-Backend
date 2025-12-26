@@ -12,6 +12,21 @@ export default {
     strapi.server.routes([
       {
         method: 'GET',
+        path: '/api/health',
+        handler: async (ctx: any) => {
+          ctx.body = {
+            status: 'ok',
+            timestamp: new Date().toISOString(),
+            uptime: process.uptime(),
+            service: 'alumni-hub-backend',
+          };
+        },
+        config: {
+          auth: false,
+        },
+      },
+      {
+        method: 'GET',
         path: '/api/user-management/all',
         handler: async (ctx: any) => {
           try {
