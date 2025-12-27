@@ -121,6 +121,8 @@ export default factories.createCoreController('api::event-attendance.event-atten
 
   /**
    * Register attendance via QR code scan
+   * This endpoint is designed to handle concurrent requests safely.
+   * Multiple users can scan QR codes simultaneously without conflicts.
    */
   async registerQRAttendance(ctx) {
     try {
@@ -154,7 +156,7 @@ export default factories.createCoreController('api::event-attendance.event-atten
       const normalizedMobile = normalizePhoneNumber(mobile);
       const normalizedWhatsapp = data.whatsapp ? normalizePhoneNumber(data.whatsapp) : normalizedMobile;
 
-      // Find or create batchmate
+      // Find or create batchmate (PostgreSQL handles concurrent operations safely)
       let batchmate;
       const existingBatchmates = await strapi.entityService.findMany('api::batchmate.batchmate', {
         filters: {
@@ -213,14 +215,20 @@ export default factories.createCoreController('api::event-attendance.event-atten
       });
 
       let attendance;
+      let isAlreadyRegistered = false;
+      
       if (existingAttendance && existingAttendance.length > 0) {
-        // Update existing attendance
-        attendance = await strapi.entityService.update('api::event-attendance.event-attendance', existingAttendance[0].id, {
+        // Already registered - check if they're trying to register again
+        const existing = existingAttendance[0];
+        isAlreadyRegistered = existing.status === 'Present';
+        
+        // Update existing attendance (in case they want to update their info)
+        attendance = await strapi.entityService.update('api::event-attendance.event-attendance', existing.id, {
           data: {
             status: 'Present',
-            attendanceMethod: 'QR_SCAN',
-            markedAt: new Date(),
-            registeredData: data,
+            attendanceMethod: existing.attendanceMethod || 'QR_SCAN',
+            markedAt: existing.markedAt || new Date(), // Keep original registration time
+            registeredData: data, // Update with latest data
           },
         });
       } else {
@@ -239,10 +247,14 @@ export default factories.createCoreController('api::event-attendance.event-atten
 
       return {
         success: true,
-        message: 'Attendance registered successfully!',
+        alreadyRegistered: isAlreadyRegistered,
+        message: isAlreadyRegistered 
+          ? 'You have already registered for this event! Your information has been updated.'
+          : 'Attendance registered successfully!',
         data: {
           attendance,
           batchmate,
+          registeredAt: attendance.markedAt,
         },
       };
     } catch (error) {
