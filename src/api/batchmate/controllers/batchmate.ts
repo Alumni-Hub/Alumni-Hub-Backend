@@ -45,17 +45,25 @@ export default factories.createCoreController('api::batchmate.batchmate', ({ str
       try {
         const batchmate = response.data;
         
-        // Find all event-attendance records for this batchmate
+        strapi.log.info(`Attempting to sync attendance for batchmate id: ${batchmate.id}, documentId: ${batchmate.documentId}`);
+        
+        // Find all event-attendance records for this batchmate using numeric id
         const attendanceRecords = await strapi.entityService.findMany('api::event-attendance.event-attendance', {
           filters: {
-            batchmate: batchmate.id,
+            batchmate: {
+              id: batchmate.id,
+            },
           },
+          populate: ['event', 'batchmate'],
         });
+        
+        strapi.log.info(`Found ${attendanceRecords.length} event-attendance records to sync`);
         
         // Update all event-attendance records to match the batchmate attendance status
         const attendanceStatus = data.attendance === 'Present' ? 'Present' : 'Absent';
         
         for (const record of attendanceRecords) {
+          strapi.log.info(`Updating event-attendance record ${record.id} to status: ${attendanceStatus}`);
           await strapi.entityService.update('api::event-attendance.event-attendance', record.id, {
             data: {
               status: attendanceStatus,
@@ -65,7 +73,7 @@ export default factories.createCoreController('api::batchmate.batchmate', ({ str
           });
         }
         
-        strapi.log.info(`Synced attendance for batchmate ${batchmate.id} to ${attendanceRecords.length} event(s)`);
+        strapi.log.info(`Successfully synced attendance for batchmate ${batchmate.id} to ${attendanceRecords.length} event(s)`);
       } catch (error) {
         strapi.log.error('Error syncing attendance to event-attendance:', error);
         // Don't fail the update if sync fails
