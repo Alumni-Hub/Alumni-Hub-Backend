@@ -1,0 +1,64 @@
+{
+  "kind": "collectionType",
+  "collectionName": "events",
+  "info": {
+    "singularName": "event",
+    "pluralName": "events",
+    "displayName": "Event",
+    "description": "Alumni events with QR code support"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "eventDate": {
+      "type": "datetime",
+      "required": true
+    },
+    "eventType": {
+      "type": "enumeration",
+      "enum": [
+        "Alumni Party",
+        "Reunion",
+        "Conference",
+        "Workshop",
+        "Networking",
+        "Other"
+      ],
+      "default": "Alumni Party"
+    },
+    "venue": {
+      "type": "string"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "Upcoming",
+        "Ongoing",
+        "Completed",
+        "Cancelled"
+      ],
+      "default": "Upcoming"
+    },
+    "qrCode": {
+      "type": "text"
+    },
+    "qrCodeUrl": {
+      "type": "string"
+    },
+    "attendees": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::event-attendance.event-attendance",
+      "mappedBy": "event"
+    }
+  }
+}

@@ -492,6 +492,103 @@ export interface ApiBatchmateBatchmate extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiEventAttendanceEventAttendance
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'event_attendances';
+  info: {
+    description: 'Track event attendance via QR code or manual marking';
+    displayName: 'Event Attendance';
+    pluralName: 'event-attendances';
+    singularName: 'event-attendance';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    attendanceMethod: Schema.Attribute.Enumeration<
+      ['QR_SCAN', 'MANUAL', 'NOT_MARKED']
+    > &
+      Schema.Attribute.DefaultTo<'NOT_MARKED'>;
+    batchmate: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::batchmate.batchmate'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    event: Schema.Attribute.Relation<'manyToOne', 'api::event.event'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::event-attendance.event-attendance'
+    > &
+      Schema.Attribute.Private;
+    markedAt: Schema.Attribute.DateTime;
+    markedBy: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    notes: Schema.Attribute.Text;
+    publishedAt: Schema.Attribute.DateTime;
+    registeredData: Schema.Attribute.JSON;
+    status: Schema.Attribute.Enumeration<['Pending', 'Present', 'Absent']> &
+      Schema.Attribute.DefaultTo<'Pending'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiEventEvent extends Struct.CollectionTypeSchema {
+  collectionName: 'events';
+  info: {
+    description: 'Alumni events with QR code support';
+    displayName: 'Event';
+    pluralName: 'events';
+    singularName: 'event';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    attendees: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::event-attendance.event-attendance'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.Text;
+    eventDate: Schema.Attribute.DateTime & Schema.Attribute.Required;
+    eventType: Schema.Attribute.Enumeration<
+      [
+        'Alumni Party',
+        'Reunion',
+        'Conference',
+        'Workshop',
+        'Networking',
+        'Other',
+      ]
+    > &
+      Schema.Attribute.DefaultTo<'Alumni Party'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::event.event'> &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    qrCode: Schema.Attribute.Text;
+    qrCodeUrl: Schema.Attribute.String;
+    status: Schema.Attribute.Enumeration<
+      ['Upcoming', 'Ongoing', 'Completed', 'Cancelled']
+    > &
+      Schema.Attribute.DefaultTo<'Upcoming'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    venue: Schema.Attribute.String;
+  };
+}
+
 export interface ApiNotificationNotification
   extends Struct.CollectionTypeSchema {
   collectionName: 'notifications';
@@ -1043,6 +1140,8 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::batchmate.batchmate': ApiBatchmateBatchmate;
+      'api::event-attendance.event-attendance': ApiEventAttendanceEventAttendance;
+      'api::event.event': ApiEventEvent;
       'api::notification.notification': ApiNotificationNotification;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

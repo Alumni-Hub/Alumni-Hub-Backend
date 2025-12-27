@@ -1,0 +1,59 @@
+{
+  "kind": "collectionType",
+  "collectionName": "event_attendances",
+  "info": {
+    "singularName": "event-attendance",
+    "pluralName": "event-attendances",
+    "displayName": "Event Attendance",
+    "description": "Track event attendance via QR code or manual marking"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "event": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::event.event",
+      "inversedBy": "attendees"
+    },
+    "batchmate": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::batchmate.batchmate"
+    },
+    "attendanceMethod": {
+      "type": "enumeration",
+      "enum": [
+        "QR_SCAN",
+        "MANUAL",
+        "NOT_MARKED"
+      ],
+      "default": "NOT_MARKED"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "Pending",
+        "Present",
+        "Absent"
+      ],
+      "default": "Pending"
+    },
+    "markedAt": {
+      "type": "datetime"
+    },
+    "markedBy": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "registeredData": {
+      "type": "json"
+    },
+    "notes": {
+      "type": "text"
+    }
+  }
+}
