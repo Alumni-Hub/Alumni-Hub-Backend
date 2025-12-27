@@ -56,9 +56,9 @@ export default factories.createCoreController('api::event.event', ({ strapi }) =
         return ctx.notFound('Event not found');
       }
 
-      // Generate QR code URL (this will redirect to the public attendance form)
+      // Generate QR code URL using documentId (required for Strapi 5)
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-      const qrCodeUrl = `${frontendUrl}/attendance/register?eventId=${id}`;
+      const qrCodeUrl = `${frontendUrl}/attendance/register?eventId=${event.documentId}`;
       
       // Generate QR code as data URL
       const qrCodeDataUrl = await QRCode.toDataURL(qrCodeUrl, {
