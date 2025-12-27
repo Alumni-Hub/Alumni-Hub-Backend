@@ -54,5 +54,25 @@ export default {
         middlewares: [],
       },
     },
+    {
+      method: 'GET',
+      path: '/batchmates/export/fieldwise',
+      handler: 'api::batchmate.batchmate.exportFieldwise',
+      config: {
+        auth: false,
+        policies: [],
+        middlewares: [],
+      },
+    },
+    {
+      method: 'GET',
+      path: '/batchmates/export/raffle-cut-sheet',
+      handler: 'api::batchmate.batchmate.exportRaffleCutSheet',
+      config: {
+        auth: false,
+        policies: [],
+        middlewares: [],
+      },
+    },
   ],
 };
