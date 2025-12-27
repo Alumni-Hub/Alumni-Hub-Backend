@@ -4,6 +4,34 @@
 
 import { factories } from '@strapi/strapi';
 
+/**
+ * Normalize phone number to standard format (94XXXXXXXXX)
+ * Handles: +94714007983, 0714007983, 94714007983
+ */
+function normalizePhoneNumber(phone: string): string {
+  if (!phone) return phone;
+  
+  // Remove all spaces, dashes, and parentheses
+  let normalized = phone.replace(/[\s\-\(\)]/g, '');
+  
+  // Remove leading + if present
+  if (normalized.startsWith('+')) {
+    normalized = normalized.substring(1);
+  }
+  
+  // If starts with 0, replace with 94 (Sri Lanka country code)
+  if (normalized.startsWith('0')) {
+    normalized = '94' + normalized.substring(1);
+  }
+  
+  // Ensure it starts with 94
+  if (!normalized.startsWith('94')) {
+    normalized = '94' + normalized;
+  }
+  
+  return normalized;
+}
+
 export default factories.createCoreController('api::event-attendance.event-attendance', ({ strapi }) => ({
   async find(ctx) {
     ctx.query = {
@@ -46,11 +74,16 @@ export default factories.createCoreController('api::event-attendance.event-atten
         return ctx.badRequest('Mobile number is required');
       }
 
-      // Search for batchmate by mobile or whatsappMobile
+      // Normalize the phone number
+      const normalizedMobile = normalizePhoneNumber(mobile);
+
+      // Search for batchmate by normalized mobile or whatsappMobile
       const batchmates = await strapi.entityService.findMany('api::batchmate.batchmate', {
         filters: {
           $or: [
-            { mobile: mobile },
+            { mobile: normalizedMobile },
+            { whatsappMobile: normalizedMobile },
+            { mobile: mobile }, // Also try original format
             { whatsappMobile: mobile },
           ],
         },
@@ -97,18 +130,38 @@ export default factories.createCoreController('api::event-attendance.event-atten
         return ctx.badRequest('Event ID, mobile number, and data are required');
       }
 
-      // Verify event exists
-      const event = await strapi.entityService.findOne('api::event.event', eventId);
+      // Verify event exists - eventId can be numeric id or documentId
+      let event;
+      try {
+        // Try as numeric id or documentId
+        event = await strapi.documents('api::event.event').findOne({
+          documentId: eventId,
+        });
+      } catch (err) {
+        // If that fails, try as numeric id
+        try {
+          event = await strapi.entityService.findOne('api::event.event', eventId);
+        } catch (innerErr) {
+          event = null;
+        }
+      }
+
       if (!event) {
         return ctx.notFound('Event not found');
       }
+
+      // Normalize phone numbers
+      const normalizedMobile = normalizePhoneNumber(mobile);
+      const normalizedWhatsapp = data.whatsapp ? normalizePhoneNumber(data.whatsapp) : normalizedMobile;
 
       // Find or create batchmate
       let batchmate;
       const existingBatchmates = await strapi.entityService.findMany('api::batchmate.batchmate', {
         filters: {
           $or: [
-            { mobile: mobile },
+            { mobile: normalizedMobile },
+            { whatsappMobile: normalizedMobile },
+            { mobile: mobile }, // Also try original format
             { whatsappMobile: mobile },
           ],
         },
@@ -125,9 +178,10 @@ export default factories.createCoreController('api::event-attendance.event-atten
             address: data.address || existingBatchmates[0].address,
             country: data.country || existingBatchmates[0].country,
             workingPlace: data.workingPlace || existingBatchmates[0].workingPlace,
-            mobile: data.mobile || existingBatchmates[0].mobile,
-            whatsappMobile: data.whatsapp || existingBatchmates[0].whatsappMobile,
+            mobile: normalizedMobile,
+            whatsappMobile: normalizedWhatsapp,
             email: data.email || data.gmail || existingBatchmates[0].email,
+            attendance: 'Present', // Update attendance status in batchmate record
           },
         });
       } else {
@@ -140,18 +194,19 @@ export default factories.createCoreController('api::event-attendance.event-atten
             address: data.address,
             country: data.country,
             workingPlace: data.workingPlace,
-            mobile: data.mobile,
-            whatsappMobile: data.whatsapp,
+            mobile: normalizedMobile,
+            whatsappMobile: normalizedWhatsapp,
             email: data.email || data.gmail,
             field: data.field || 'Computer Engineering', // Default field
+            attendance: 'Present', // Set attendance status
           },
         });
       }
 
-      // Check if attendance record already exists
+      // Check if attendance record already exists - use event.id for relation
       const existingAttendance = await strapi.entityService.findMany('api::event-attendance.event-attendance', {
         filters: {
-          event: eventId,
+          event: event.id,
           batchmate: batchmate.id,
         },
         limit: 1,
@@ -169,10 +224,10 @@ export default factories.createCoreController('api::event-attendance.event-atten
           },
         });
       } else {
-        // Create new attendance record
+        // Create new attendance record - use event.id for relation
         attendance = await strapi.entityService.create('api::event-attendance.event-attendance', {
           data: {
-            event: eventId,
+            event: event.id,
             batchmate: batchmate.id,
             status: 'Present',
             attendanceMethod: 'QR_SCAN',
