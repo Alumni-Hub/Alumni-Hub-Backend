@@ -323,6 +323,15 @@ export default factories.createCoreController('api::event-attendance.event-atten
         });
       }
 
+      // Sync attendance status back to batchmate
+      if (status === 'Present' || status === 'Absent') {
+        await strapi.entityService.update('api::batchmate.batchmate', batchmateId, {
+          data: {
+            attendance: status,
+          },
+        });
+      }
+
       return {
         success: true,
         message: 'Attendance marked successfully!',
@@ -407,6 +416,15 @@ export default factories.createCoreController('api::event-attendance.event-atten
               markedAt: new Date(),
               markedBy: user?.id,
               notes,
+            },
+          });
+        }
+
+        // Sync attendance status back to batchmate
+        if (status === 'Present' || status === 'Absent') {
+          await strapi.entityService.update('api::batchmate.batchmate', batchmateId, {
+            data: {
+              attendance: status,
             },
           });
         }
