@@ -137,9 +137,9 @@ export default factories.createCoreController('api::batchmate.batchmate', ({ str
    */
   async exportRaffleCutSheet(ctx) {
     try {
-      // Fetch all batchmates with calling name or full name
+      // Fetch all batchmates with full name
       const batchmates = await strapi.entityService.findMany('api::batchmate.batchmate', {
-        fields: ['callingName', 'fullName'],
+        fields: ['fullName'],
       });
 
       if (!batchmates || batchmates.length === 0) {
@@ -154,7 +154,7 @@ export default factories.createCoreController('api::batchmate.batchmate', ({ str
       const worksheet = workbook.addWorksheet('Raffle_Draw_Names');
 
       // Add header
-      worksheet.addRow(['Name']);
+      worksheet.addRow(['Full Name']);
       const headerRow = worksheet.getRow(1);
       headerRow.font = { bold: true, size: 14 };
       headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
@@ -172,7 +172,7 @@ export default factories.createCoreController('api::batchmate.batchmate', ({ str
 
       // Add each name with borders (not sorted as requested)
       batchmates.forEach(batchmate => {
-        const name = batchmate.callingName || batchmate.fullName || 'Unknown';
+        const name = batchmate.fullName || 'Unknown';
         const row = worksheet.addRow([name]);
         
         // Set row height for easy cutting
@@ -194,7 +194,7 @@ export default factories.createCoreController('api::batchmate.batchmate', ({ str
       });
 
       // Set column width
-      worksheet.getColumn(1).width = 40;
+      worksheet.getColumn(1).width = 50;
 
       // Generate buffer
       const buffer = await workbook.xlsx.writeBuffer();
